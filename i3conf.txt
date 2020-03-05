@@ -1,0 +1,100 @@
+general {
+        colors = true
+        interval = 3
+}
+order += "cpu_usage"
+order += "load"
+order += "disk /"
+order += "ethernet _first_"
+order += "volume master"
+order += "tztime local"
+ethernet  _first_ {
+        # if you use %speed, i3status requires root privileges
+#        format_up = "E: %ip (%speed)"
+        format_up = "eth: %ip"
+        format_down = "E: down"
+}
+cpu_usage {
+        format = "CPU %usage "
+}
+tztime local {
+        format = "%Y-%m-%d %H:%M:%S"
+}
+load {
+        format = "%1min %5min %15min"
+}
+disk "/" {
+  format = "Used / %percentage_used"
+  separator = false
+}
+volume master {
+        format = "♪: %volume"
+        format_muted = "♪: muted (%volume)"
+        device = "default"
+        mixer = "Master"
+        mixer_idx = 0
+}
+
+# Change Font
+font pango:monospace 10
+# Move status bar on top
+bar {
+        position top
+        status_command i3status
+}
+# Add gaps between windows look nicer
+gaps inner 5
+gaps outer 5
+# Mouse, please stop focus whenever you hover to whatever
+focus_follows_mouse no
+# Use Mouse+$mod to drag floating windows to their wanted position
+floating_modifier $mod
+# Enable floating dialogs application window
+for_window [window_role="pop-up"] floating enable
+for_window [window_role="task_dialog"] floating enable
+# Key bind for Alsa sound
+# Note: My keyboard has dedicated buttons that it is mapped to alsamixer
+bindsym XF86AudioRaiseVolume exec amixer -q sset Master 5%+ unmute
+bindsym XF86AudioLowerVolume  exec amixer -q sset Master 5%- unmute
+bindsym XF86AudioMute exec amixer -q sset Master toggle
+bindsym $mod+= exec amixer -q sset Master 5%+ unmute
+bindsym $mod+- exec amixer -q sset Master 5%- unmute
+bindsym $mod+x [urgent=latest] focus
+# num lock activated
+exec_always --no-startup-id numlockx on
+exec_always --no-startup-id conky
+# Assign application to start on a specific workspace xprop
+assign [class="^Firefox$"] 1
+assign [class="^Slack$"] 3
+assign [class="^Code$"] 2
+assign [class="^Vlc$"] 9
+assign [class="^Spotify$"] 10
+for_window [class="Spotify"] move to workspace 10
+for_window [class="^Slack$"] floating enable
+# Restart or shutdown or suspend by using WinKey+Pause key with meny to select option
+set $mode_system System (l) lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
+mode "$mode_system" {
+    bindsym l exec --no-startup-id $Locker, mode "default"
+    bindsym e exec --no-startup-id i3-msg exit, mode "default"
+    bindsym s exec --no-startup-id $Locker && systemctl suspend, mode "default"
+    bindsym h exec --no-startup-id $Locker && systemctl hibernate, mode "default"
+    bindsym r exec --no-startup-id systemctl reboot, mode "default"
+    bindsym Shift+s exec --no-startup-id systemctl poweroff -i, mode "default"
+# back to normal: Enter or Escape
+    bindsym Return mode "default"
+    bindsym Escape mode "default"
+}
+bindsym $mod+Pause mode "$mode_system"
+# Custom Keybindings
+# Shortcuts to start application
+bindsym $mod+Ctrl+f exec --no-startup-id firefox
+bindsym $mod+Ctrl+v exec --no-startup-id vlc
+bindsym $mod+Ctrl+c exec --no-startup-id chromium
+bindsym $mod+Ctrl+r exec --no-startup-id urxvt -e ranger
+# lock PC
+bindsym $mod+Ctrl+Delete exec $Locker, mode "default"
+# Change you $USER home director and you may need to install packages imagemagick xclip 
+# take a screenshot of a screen region and copy it to a clipboard
+bindsym --release Shift+Print exec "/home/mudrii/.local/bin/screensh -s /home/mudrii/Images/"
+# take a screenshot of a whole window and copy it to a clipboard
+bindsym --release Print exec "/home/mudrii/.local/bin/screensh /home/mudrii/Images/"
